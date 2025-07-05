@@ -1,0 +1,52 @@
+{
+  "pneumonia": {
+    "description": "Pneumonia is an infection that inflames the air sacs in one or both lungs.",
+    "foods_to_eat": ["warm fluids", "soups", "leafy greens", "vitamin C-rich fruits"],
+    "foods_to_avoid": ["cold drinks", "fried foods", "processed sugars"]
+  },
+  "malaria": {
+    "description": "Malaria is a mosquito-borne disease caused by a parasite.",
+    "foods_to_eat": ["coconut water", "fruit juices", "boiled vegetables", "high-protein foods"],
+    "foods_to_avoid": ["caffeine", "fried foods", "heavy meals"]
+  },
+  "food_poisoning": {
+    "description": "Food poisoning is an illness caused by eating contaminated food.",
+    "foods_to_eat": ["banana", "boiled rice", "toast", "clear broths"],
+    "foods_to_avoid": ["dairy", "spicy food", "fatty or greasy foods"]
+  },
+  "migraine": {
+    "description": "Migraine is a neurological condition often causing intense headaches and sensitivity to light or sound.",
+    "foods_to_eat": ["magnesium-rich foods", "leafy greens", "whole grains"],
+    "foods_to_avoid": ["chocolate", "aged cheese", "processed meats", "caffeine"]
+  },
+  "dengue": {
+    "description": "Dengue is a viral infection transmitted by mosquitoes.",
+    "foods_to_eat": ["papaya leaf juice", "pomegranate", "fluids", "citrus fruits"],
+    "foods_to_avoid": ["oily food", "spicy food", "caffeinated drinks"]
+  },
+  "common_cold": {
+    "description": "The common cold is a viral infection of your nose and throat.",
+    "foods_to_eat": ["chicken soup", "herbal teas", "citrus fruits"],
+    "foods_to_avoid": ["cold drinks", "sugary snacks", "dairy (in some cases)"]
+  },
+  "typhoid": {
+    "description": "Typhoid is a bacterial infection caused by Salmonella typhi.",
+    "foods_to_eat": ["boiled vegetables", "porridge", "banana", "toast"],
+    "foods_to_avoid": ["spicy food", "raw vegetables", "milk products"]
+  },
+  "covid-19": {
+    "description": "COVID-19 is a respiratory illness caused by the SARS-CoV-2 virus.",
+    "foods_to_eat": ["high-protein foods", "fruits", "vegetables", "hydrating fluids"],
+    "foods_to_avoid": ["alcohol", "sugary drinks", "fried and processed foods"]
+  },
+  "flu": {
+    "description": "The flu is a contagious respiratory illness caused by influenza viruses.",
+    "foods_to_eat": ["hot teas", "soups", "fruits high in vitamin C"],
+    "foods_to_avoid": ["cold beverages", "heavy meals", "dairy (if congested)"]
+  },
+  "gastritis": {
+    "description": "Gastritis is the inflammation of the stomach lining.",
+    "foods_to_eat": ["boiled vegetables", "plain rice", "banana", "non-acidic fruits"],
+    "foods_to_avoid": ["spicy food", "alcohol", "caffeine", "acidic foods"]
+  }
+}
