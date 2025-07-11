@@ -6,123 +6,221 @@ import symptomsList from "../data/symptoms";
 const Chatbot = () => {
   const { symptoms, addSymptom } = useSymptomContext();
   const [messages, setMessages] = useState([
-    { sender: "bot", text: "Hi! Select symptoms below or type commands like 'predict' or 'info'." },
+    { sender: "bot", text: "Hi! Tell me your symptoms, or type 'predict'." },
   ]);
   const [input, setInput] = useState("");
-  const [dropdownSymptom, setDropdownSymptom] = useState(""); // new
   const [predictedDisease, setPredictedDisease] = useState(null);
   const navigate = useNavigate();
 
-  const handleDropdownAdd = () => {
-    if (dropdownSymptom && !symptoms.includes(dropdownSymptom)) {
-      addSymptom(dropdownSymptom);
+  const handlePredict = async () => {
+    const symptomsVector = symptomsList.map((sym) =>
+      symptoms.includes(sym) ? 1 : 0
+    );
+
+    try {
+      const res = await fetch("http://localhost:5000/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ symptoms_vector: symptomsVector }),
+      });
+
+      const data = await res.json();
+      if (data.predicted_disease) {
+        setPredictedDisease(data.predicted_disease);
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: "bot",
+            text: `Based on your symptoms, you may have ${data.predicted_disease}.`,
+          },
+          { sender: "bot", text: "Click below to learn more." },
+        ]);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          { sender: "bot", text: "Sorry, I couldn't make a prediction." },
+        ]);
+      }
+    } catch (error) {
       setMessages((prev) => [
         ...prev,
-        { sender: "user", text: dropdownSymptom },
-        { sender: "bot", text: "Symptom added. Anything else?" },
+        { sender: "bot", text: "Error connecting to the prediction server." },
       ]);
     }
   };
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
-
-    const userMessage = input.trim().toLowerCase();
-    setMessages((prev) => [...prev, { sender: "user", text: input }]);
-    setInput("");
-
-    if (userMessage === "predict") {
-      const symptomsVector = symptomsList.map((sym) =>
-        symptoms.includes(sym) ? 1 : 0
-      );
-
-      try {
-        const res = await fetch("http://localhost:5000/predict", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ symptoms_vector: symptomsVector }),
-        });
-
-        const data = await res.json();
-        if (data.predicted_disease) {
-          setPredictedDisease(data.predicted_disease);
-          setMessages((prev) => [
-            ...prev,
-            {
-              sender: "bot",
-              text: `Based on your symptoms, you may have ${data.predicted_disease}. Type 'info' to learn more.`,
-            },
-          ]);
-        } else {
-          setMessages((prev) => [
-            ...prev,
-            { sender: "bot", text: "Sorry, I couldn't make a prediction." },
-          ]);
-        }
-      } catch (error) {
+  const handleAddSymptom = () => {
+    if (input) {
+      if (!symptoms.includes(input)) {
+        addSymptom(input);
         setMessages((prev) => [
           ...prev,
-          { sender: "bot", text: "Error connecting to the prediction server." },
+          { sender: "user", text: input },
+          { sender: "bot", text: "Symptom added. Anything else?" },
+        ]);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          { sender: "bot", text: "You've already added this symptom." },
         ]);
       }
-    } else if (userMessage === "info" && predictedDisease) {
-      navigate(`/info/${predictedDisease}`);
-    } else {
-      setMessages((prev) => [
-        ...prev,
-        { sender: "bot", text: "Please use the dropdown to select valid symptoms." },
-      ]);
+      setInput("");
     }
+  };
+
+  const handleReset = () => {
+    setMessages([
+      { sender: "bot", text: "Hi! Tell me your symptoms, or type 'predict'." },
+    ]);
+    setInput("");
+    setPredictedDisease(null);
+    // Optional: clear symptom context (if implemented)
   };
 
   return (
-    <div style={{ padding: "2rem" }}>
-      <h2>Chatbot</h2>
+    <div style={{ padding: "2rem", maxWidth: "650px", margin: "0 auto" }}>
+      <h2 style={{ textAlign: "center" }}>🩺 Diagnosify Chatbot</h2>
 
+      {/* Chat Window */}
       <div
         style={{
           border: "1px solid #ccc",
+          borderRadius: "10px",
           padding: "1rem",
-          height: "300px",
+          height: "400px",
           overflowY: "auto",
-          marginBottom: "1rem",
+          backgroundColor: "#f9f9f9",
+          display: "flex",
+          flexDirection: "column",
+          gap: "0.5rem",
         }}
       >
         {messages.map((msg, index) => (
-          <p key={index} style={{ color: msg.sender === "bot" ? "green" : "blue" }}>
-            <strong>{msg.sender === "bot" ? "Bot:" : "You:"}</strong> {msg.text}
-          </p>
+          <div
+            key={index}
+            style={{
+              alignSelf: msg.sender === "user" ? "flex-end" : "flex-start",
+              backgroundColor: msg.sender === "user" ? "#daf1ff" : "#e4e4e4",
+              color: "#000",
+              padding: "0.6rem 1rem",
+              borderRadius: "20px",
+              maxWidth: "80%",
+              whiteSpace: "pre-wrap",
+            }}
+          >
+            <strong>{msg.sender === "bot" ? "🤖" : "🧑"} </strong>
+            {msg.text}
+          </div>
         ))}
       </div>
 
-      {/* Dropdown to select symptoms */}
-      <div style={{ marginBottom: "1rem" }}>
+      {/* Controls */}
+      <div style={{ marginTop: "1.5rem" }}>
         <select
-          value={dropdownSymptom}
-          onChange={(e) => setDropdownSymptom(e.target.value)}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          style={{ padding: "0.5rem", borderRadius: "5px", width: "100%" }}
         >
-          <option value="">-- Select a symptom --</option>
-          {symptomsList.map((sym) => (
-            <option key={sym} value={sym}>
+          <option value="">Select a symptom</option>
+          {symptomsList.map((sym, idx) => (
+            <option key={idx} value={sym}>
               {sym.replaceAll("_", " ")}
             </option>
           ))}
         </select>
-        <button onClick={handleDropdownAdd} style={{ marginLeft: "1rem" }}>
-          Add Symptom
-        </button>
+
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "1rem",
+            marginTop: "1rem",
+          }}
+        >
+          <button
+            onClick={handleAddSymptom}
+            style={{
+              padding: "0.5rem 1rem",
+              borderRadius: "5px",
+              backgroundColor: "#2196f3",
+              color: "#fff",
+              border: "none",
+            }}
+          >
+            Add Symptom
+          </button>
+
+          <button
+            onClick={handlePredict}
+            disabled={symptoms.length === 0}
+            style={{
+              padding: "0.5rem 1rem",
+              borderRadius: "5px",
+              backgroundColor: symptoms.length === 0 ? "#aaa" : "#673ab7",
+              color: "#fff",
+              border: "none",
+              cursor: symptoms.length === 0 ? "not-allowed" : "pointer",
+            }}
+          >
+            Predict
+          </button>
+
+          {predictedDisease && (
+            <button
+              onClick={() => navigate(`/info/${predictedDisease}`)}
+              style={{
+                padding: "0.5rem 1rem",
+                backgroundColor: "#4caf50",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+              }}
+            >
+              Learn More
+            </button>
+          )}
+
+          <button
+            onClick={handleReset}
+            style={{
+              padding: "0.5rem 1rem",
+              backgroundColor: "#f44336",
+              color: "white",
+              border: "none",
+              borderRadius: "5px",
+            }}
+          >
+            Reset
+          </button>
+        </div>
       </div>
 
-      {/* Input for commands like 'predict' */}
-      <input
-        type="text"
-        placeholder="Type a command (predict/info)"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && handleSend()}
-        style={{ width: "80%", marginRight: "1rem" }}
-      />
-      <button onClick={handleSend}>Send</button>
+      {/* Display Added Symptoms */}
+      <div style={{ marginTop: "1.5rem" }}>
+        <strong>📝 Symptoms you've added:</strong>
+        <div
+          style={{
+            marginTop: "0.5rem",
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "0.5rem",
+          }}
+        >
+          {symptoms.map((sym, idx) => (
+            <span
+              key={idx}
+              style={{
+                backgroundColor: "#d1ecf1",
+                padding: "0.4rem 0.8rem",
+                borderRadius: "15px",
+                fontSize: "0.9rem",
+              }}
+            >
+              {sym.replaceAll("_", " ")}
+            </span>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

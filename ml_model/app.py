@@ -12,12 +12,11 @@ app = Flask(__name__)
 CORS(app)  # Allow cross-origin requests from React frontend
 
 # Load knowledge base
-with open("ml_model/disease_knowledge.json") as f:
+with open("disease_knowledge.json") as f:
     disease_knowledge = json.load(f)
 
 # Load vectorizer and model for chatbot
-vectorizer = pickle.load(open("ml_model/vectorizer.pkl", "rb"))
-model = pickle.load(open("ml_model/model.pkl", "rb"))
+model = pickle.load(open("model/model.pkl", "rb"))
 
 # Home route
 @app.route("/")
@@ -76,3 +75,32 @@ def chatbot():
 
 if __name__ == "__main__":
     app.run(port=5000, debug=True)
+
+
+# import pickle
+# import numpy as np
+# from flask import Flask, request, jsonify
+# from flask_cors import CORS
+
+# # Load model
+# model = pickle.load(open("model/model.pkl", "rb"))
+
+# # List of symptoms (must match training!)
+# symptoms_list = [
+#     "fever", "cough", "headache", "fatigue", "nausea", "vomiting", "diarrhea",
+#     "sore_throat", "runny_nose", "muscle_pain", "chills", "rash", "joint_pain",
+#     # ...
+# ]
+
+# app = Flask(__name__)
+# CORS(app)
+
+# @app.route("/predict", methods=["POST"])
+# def predict():
+#     data = request.json
+#     input_vector = np.array(data["symptoms_vector"]).reshape(1, -1)
+#     prediction = model.predict(input_vector)[0]
+#     return jsonify({"predicted_disease": prediction})
+
+# if __name__ == "__main__":
+#     app.run(debug=True)

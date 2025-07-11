@@ -11,6 +11,7 @@ export const SymptomProvider = ({ children }) => {
       setSymptoms((prev) => [...prev, symptom]);
     }
   };
+  
 
   return (
     <SymptomContext.Provider value={{ symptoms, addSymptom }}>
